@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -13,11 +12,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -34,82 +30,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { columns } from "./dropdown/dropdown";
+import { User } from "@/type/User";
 
-interface User {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-}
-
-const columns: ColumnDef<User>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value: any) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value: any) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="py-2 px-4"
-      >
-        Name
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="py-2 px-4">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "username",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="py-2 px-4"
-      >
-        Username
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="py-2 px-4">{row.getValue("username")}</div>,
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="py-2 px-4"
-      >
-        Email
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="py-2 px-4 lowercase">{row.getValue("email")}</div>,
-  },
-];
-
-export default function DataTableDemo() {
+export default function Page() {
   const [hasMoreData, setHasMoreData] = React.useState(false);
   const [data, setData] = React.useState<User[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -129,7 +53,6 @@ export default function DataTableDemo() {
       setLoading(true);
       setError(null);
       try {
-        // Fetch one extra record to check if there is more data
         const response = await fetch(
           `https://jsonplaceholder.typicode.com/users?_page=${currentPage}&_limit=6`
         );
@@ -139,9 +62,8 @@ export default function DataTableDemo() {
         }
 
         const result: User[] = await response.json();
-        // Update data and set hasMoreData based on the number of records fetched
-        setData(result.slice(0, 5)); // Only display the first 5 records
-        setHasMoreData(result.length > 5); // Check if there is an extra record
+        setData(result.slice(0, 5));
+        setHasMoreData(result.length > 5);
       } catch (error) {
         setError((error as Error).message || "An unknown error occurred.");
       } finally {
