@@ -110,6 +110,7 @@ const columns: ColumnDef<User>[] = [
 ];
 
 export default function DataTableDemo() {
+  const [hasMoreData, setHasMoreData] = React.useState(false);
   const [data, setData] = React.useState<User[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -128,8 +129,9 @@ export default function DataTableDemo() {
       setLoading(true);
       setError(null);
       try {
+        // Fetch one extra record to check if there is more data
         const response = await fetch(
-          `https://jsonplaceholder.typicode.com/users?_page=${currentPage}&_limit=5`
+          `https://jsonplaceholder.typicode.com/users?_page=${currentPage}&_limit=6`
         );
 
         if (!response.ok) {
@@ -137,7 +139,9 @@ export default function DataTableDemo() {
         }
 
         const result: User[] = await response.json();
-        setData(result);
+        // Update data and set hasMoreData based on the number of records fetched
+        setData(result.slice(0, 5)); // Only display the first 5 records
+        setHasMoreData(result.length > 5); // Check if there is an extra record
       } catch (error) {
         setError((error as Error).message || "An unknown error occurred.");
       } finally {
@@ -147,6 +151,7 @@ export default function DataTableDemo() {
 
     fetchData();
   }, [currentPage]);
+
 
   const table = useReactTable({
     data,
@@ -300,13 +305,14 @@ export default function DataTableDemo() {
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={data.length < 5}
+              disabled={!hasMoreData}
               className="py-2 px-4"
             >
               Next
             </Button>
           </div>
         </div>
+
       )}
     </div>
   );
