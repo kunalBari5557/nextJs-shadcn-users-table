@@ -1,12 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
-
-import {
-    ColumnDef,
-} from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/type/User";
-
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -17,14 +13,18 @@ export const columns: ColumnDef<User>[] = [
                     table.getIsAllPageRowsSelected() ||
                     (table.getIsSomePageRowsSelected() && "indeterminate")
                 }
-                onCheckedChange={(value: any) => table.toggleAllPageRowsSelected(!!value)}
+                onCheckedChange={(value: boolean | "indeterminate") =>
+                    table.toggleAllPageRowsSelected(!!value)
+                }
                 aria-label="Select all"
             />
         ),
         cell: ({ row }) => (
             <Checkbox
                 checked={row.getIsSelected()}
-                onCheckedChange={(value: any) => row.toggleSelected(!!value)}
+                onCheckedChange={(value: boolean | "indeterminate") =>
+                    row.toggleSelected(!!value)
+                }
                 aria-label="Select row"
             />
         ),

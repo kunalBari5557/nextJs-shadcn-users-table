@@ -74,7 +74,6 @@ export default function Page() {
     fetchData();
   }, [currentPage]);
 
-
   const table = useReactTable({
     data,
     columns,
@@ -175,7 +174,7 @@ export default function Page() {
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header: any) => (
+                  {headerGroup.headers.map((header) => (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
@@ -192,7 +191,7 @@ export default function Page() {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map((cell: any) => (
+                    {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-2 px-4">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
@@ -234,7 +233,6 @@ export default function Page() {
             </Button>
           </div>
         </div>
-
       )}
     </div>
   );
