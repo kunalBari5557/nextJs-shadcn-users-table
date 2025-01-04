@@ -14,6 +14,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -114,11 +115,17 @@ export default function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://jsonplaceholder.typicode.com/users");
+        const response = await fetch(
+          `https://jsonplaceholder.typicode.com/users?_page=${currentPage}&_limit=5`
+        );
         const result: User[] = await response.json();
         setData(result);
       } catch (error) {
@@ -127,7 +134,7 @@ export default function DataTableDemo() {
     };
 
     fetchData();
-  }, []);
+  }, [currentPage]);
 
   const table = useReactTable({
     data,
@@ -160,6 +167,10 @@ export default function DataTableDemo() {
       },
     },
   });
+
+  const handlePageChange = (page: number) => {
+    router.push(`?page=${page}`);
+  };
 
   return (
     <div className="w-full">
@@ -236,8 +247,8 @@ export default function DataTableDemo() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
             className="py-2 px-4"
           >
             Previous
@@ -245,8 +256,8 @@ export default function DataTableDemo() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={data.length < 5}
             className="py-2 px-4"
           >
             Next
